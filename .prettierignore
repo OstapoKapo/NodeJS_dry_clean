@@ -4,4 +4,3 @@ coverage
 package-lock.json
 prisma/migrations
 .omc
-AGENTS.md
