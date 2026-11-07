@@ -1,6 +1,6 @@
 # Dry Cleaning Management System
 
-> This spec describes the **full system target**. Lab 1 delivers only the project foundation; see [Lab 1 scope](#lab-1-scope). Sections marked *target* are implemented in later labs.
+> This spec describes the **full system target**. Lab 1 delivers only the project foundation; see [Lab 1 scope](#lab-1-scope). Sections marked _target_ are implemented in later labs.
 
 ## Purpose
 
@@ -16,11 +16,11 @@ Customers and Services are independent. When creating an order, Orders checks th
 
 ## Data model
 
-| Model | Fields and relationships |
-| --- | --- |
-| Customer | `id`, `firstName`, `lastName`, `phone`, optional `email`; one customer has many orders. |
-| Service | `id`, `name`, `priceCents` (nonnegative integer), `isActive`; one service can appear in many items. |
-| Order | `id`, `customerId`, `status`, `totalCents`; belongs to a customer and has at least one item. |
+| Model     | Fields and relationships                                                                                                     |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Customer  | `id`, `firstName`, `lastName`, `phone`, optional `email`; one customer has many orders.                                      |
+| Service   | `id`, `name`, `priceCents` (nonnegative integer), `isActive`; one service can appear in many items.                          |
+| Order     | `id`, `customerId`, `status`, `totalCents`; belongs to a customer and has at least one item.                                 |
 | OrderItem | `id`, `orderId`, `serviceId`, `quantity` (positive integer), `unitPriceCents`; belongs to an order and references a service. |
 
 Amounts use integer cents. `totalCents = Σ(quantity × unitPriceCents)`. Each item's `unitPriceCents` is a snapshot of the service price at order creation.
