@@ -1,0 +1,57 @@
+{
+  "name": "dry-cleaning-api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Dry cleaning management REST API (NestJS, Prisma, PostgreSQL)",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=20.19"
+  },
+  "scripts": {
+    "build": "prisma generate && nest build",
+    "start": "node --env-file=.env dist/main",
+    "start:dev": "node --env-file=.env ./node_modules/@nestjs/cli/bin/nest.js start --watch",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "jest --runInBand",
+    "test:smoke": "jest --runInBand test/app.smoke.spec.ts",
+    "prisma:generate": "prisma generate",
+    "prisma:validate": "prisma validate",
+    "prisma:migrate": "prisma migrate deploy",
+    "prisma:migrate:dev": "prisma migrate dev",
+    "audit:modules": "node scripts/audit-modules.mjs"
+  },
+  "dependencies": {
+    "@nestjs/common": "11.2.8",
+    "@nestjs/core": "11.2.8",
+    "@nestjs/platform-express": "11.2.8",
+    "@prisma/client": "6.19.3",
+    "reflect-metadata": "0.2.2",
+    "rxjs": "7.8.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.5",
+    "@nestjs/cli": "11.0.24",
+    "@nestjs/testing": "11.2.8",
+    "@types/jest": "30.0.0",
+    "@types/node": "24.19.2",
+    "eslint": "9.39.5",
+    "eslint-config-prettier": "10.1.8",
+    "globals": "17.14.0",
+    "jest": "30.5.2",
+    "prettier": "3.9.10",
+    "prisma": "6.19.3",
+    "ts-jest": "29.4.15",
+    "ts-node": "10.9.2",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.72.1"
+  },
+  "allowScripts": {
+    "prisma@6.19.3": true,
+    "@prisma/client@6.19.3": true,
+    "@prisma/engines@6.19.3": true,
+    "@parcel/watcher": false
+  }
+}
