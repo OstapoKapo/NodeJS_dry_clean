@@ -48,9 +48,9 @@ Lab 1 builds the runnable foundation only. Customer, service, and order CRUD and
 
 - **Scaffold:** a NestJS + TypeScript app starts with PostgreSQL configured through environment variables (`DATABASE_URL`, `PORT`); an `.env.example` documents them.
 - **Migration:** the Prisma schema models Customer, Service, Order, and OrderItem as in the data model above; `prisma validate` passes and the initial migration applies to a fresh database.
-- **Module boundaries:** `CustomersModule`, `ServicesModule`, and `OrdersModule` exist. Orders imports Customers and Services; Customers and Services import neither each other nor Orders. Order item code lives inside Orders; there is no `OrderItemsModule`. One shared Prisma provider is used by all modules.
+- **Module boundaries:** `CustomersModule`, `ServicesModule`, and `OrdersModule` exist. Orders imports Customers and Services; Customers and Services import neither each other nor Orders. The module audit rejects forbidden relative and path-alias imports and verifies the actual NestJS `imports` arrays. Order item code lives inside Orders; there is no `OrderItemsModule`. One shared Prisma provider is used by all modules.
 - **Layering:** controllers contain HTTP handling only; business logic belongs in services. No placeholder CRUD endpoints.
-- **`GET /version`:** returns `{ "sha": "<git commit SHA>" }`. A smoke test verifies the response using an injected known SHA.
+- **`GET /version`:** returns `{ "sha": "<git commit SHA>" }`. `VersionController` and `GitShaService` are registered in `AppModule`, without a separate `VersionModule`. A smoke test sends a real HTTP request and verifies the response using an injected known SHA.
 - **Documentation:** the README covers prerequisites, local database setup, migration, development, and checks. `standards/` holds the spec format, MADR ADR format, Definition of Done, and review checklist; decisions are recorded in `docs/adr/`.
 - **Checks and hooks:** formatting, lint, type check, Prisma validation, smoke test, module audit, and build run through the Makefile. Repository Git hooks (`.githooks/`) exit non-zero when their checks fail: pre-commit runs format, lint, and smoke; pre-push runs the full check.
 - **AI record:** prompts and responses are kept in `ai/` without secrets.

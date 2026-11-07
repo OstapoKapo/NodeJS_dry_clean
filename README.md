@@ -37,13 +37,13 @@ make format         # apply Prettier
 make hooks          # install repository Git hooks for this clone
 ```
 
-The pre-commit hook runs `make commit-check`; the pre-push hook runs `make check`. Both block the Git action on a failing check. Git does not install repository hooks automatically, so run `make hooks` after cloning. The smoke test starts the Nest application with a mocked database provider and known SHA, so it does not need PostgreSQL.
+The pre-commit hook runs `make commit-check`; the pre-push hook runs `make check`. Both block the Git action on a failing check. Git does not install repository hooks automatically, so run `make hooks` after cloning. The smoke test sends an HTTP request through Nest with a mocked database provider and known SHA. Its in-memory transport needs neither PostgreSQL nor a listening port.
 
 ## Project layout
 
 - `src/customers/`, `src/services/`, `src/orders/`: feature modules; Orders depends on Customers and Services, while the other two are independent. Order items belong inside Orders.
 - `src/prisma/`: shared Prisma provider. `prisma/`: schema and migrations.
-- `src/version/`: commit SHA endpoint.
+- `src/version/`: commit SHA controller and service, registered directly in `AppModule`.
 - `standards/`: project document formats, Definition of Done, and review checklist.
 - `docs/adr/`: accepted architecture decisions. `docs/plans/`: implementation plans.
 - `ai/`: prompts and responses used for project work, without secrets.

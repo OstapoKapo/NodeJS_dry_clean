@@ -9,7 +9,9 @@
 
 - [ ] Controllers contain HTTP handling only; no Prisma calls or business rules in controllers.
 - [ ] Module imports follow `Orders → Customers, Services`; Customers and Services do not import each other or Orders.
+- [ ] The dependency audit catches forbidden relative and path-alias imports and checks actual NestJS `imports` arrays.
 - [ ] Order item code lives in `src/orders/`; no `OrderItemsModule`.
+- [ ] A single infrastructure endpoint does not introduce an unnecessary feature module.
 - [ ] Modules use the shared `PrismaService`; no `new PrismaClient()` outside `src/prisma/`.
 
 ## Correctness
@@ -27,5 +29,6 @@
 ## Quality
 
 - [ ] `make check` passes; new behavior is tested.
+- [ ] HTTP smoke tests send requests through the application server and assert status and response body.
 - [ ] No secrets, credentials, or `.env` files committed (including in `ai/`).
 - [ ] Names are clear; no dead code or commented-out blocks.

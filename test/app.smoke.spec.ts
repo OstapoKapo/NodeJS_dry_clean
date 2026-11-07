@@ -1,12 +1,73 @@
-import { INestApplication, RequestMethod } from '@nestjs/common';
-import { METHOD_METADATA, PATH_METADATA } from '@nestjs/common/constants';
+import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import { Agent, get, Server } from 'node:http';
+import { Socket } from 'node:net';
+import { Duplex } from 'node:stream';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { GitShaService } from '../src/version/git-sha.service';
-import { VersionController } from '../src/version/version.controller';
 
 const KNOWN_SHA = '0123456789abcdef0123456789abcdef01234567';
+
+function socketPair(): [Duplex, Duplex] {
+  const client = new Duplex({
+    read() {},
+    write(chunk, _encoding, done) {
+      server.push(chunk);
+      done();
+    },
+    final(done) {
+      server.push(null);
+      done();
+    },
+  });
+  const server = new Duplex({
+    read() {},
+    write(chunk, _encoding, done) {
+      client.push(chunk);
+      done();
+    },
+    final(done) {
+      client.push(null);
+      done();
+    },
+  });
+  for (const socket of [client, server]) {
+    Object.assign(socket, {
+      setTimeout: () => socket,
+      setNoDelay: () => socket,
+      setKeepAlive: () => socket,
+      ref: () => socket,
+      unref: () => socket,
+    });
+  }
+  return [client, server];
+}
+
+async function getVersionOverHttp(
+  server: Server,
+): Promise<{ status: number | undefined; body: string }> {
+  const agent = new Agent();
+  agent.createConnection = () => {
+    const [client, serverSocket] = socketPair();
+    process.nextTick(() => server.emit('connection', serverSocket));
+    return client as Socket;
+  };
+
+  try {
+    return await new Promise((resolve, reject) => {
+      get({ host: 'localhost', path: '/version', agent }, (response) => {
+        let body = '';
+        response.setEncoding('utf8');
+        response.on('data', (chunk: string) => (body += chunk));
+        response.on('end', () => resolve({ status: response.statusCode, body }));
+        response.on('error', reject);
+      }).on('error', reject);
+    });
+  } finally {
+    agent.destroy();
+  }
+}
 
 /**
  * Boots the full AppModule (all feature modules and their DI wiring) without a database,
@@ -31,11 +92,9 @@ describe('App smoke test', () => {
     await app.close();
   });
 
-  it('registers GET /version and returns the commit SHA', () => {
-    const controller = app.get(VersionController);
-    expect(Reflect.getMetadata(PATH_METADATA, VersionController)).toBe('version');
-    expect(Reflect.getMetadata(PATH_METADATA, controller.getVersion)).toBe('/');
-    expect(Reflect.getMetadata(METHOD_METADATA, controller.getVersion)).toBe(RequestMethod.GET);
-    expect(controller.getVersion()).toEqual({ sha: KNOWN_SHA });
+  it('serves GET /version through HTTP with the commit SHA', async () => {
+    const response = await getVersionOverHttp(app.getHttpServer() as Server);
+    expect(response.status).toBe(200);
+    expect(JSON.parse(response.body)).toEqual({ sha: KNOWN_SHA });
   });
 });

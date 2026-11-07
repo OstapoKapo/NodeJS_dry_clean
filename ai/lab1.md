@@ -25,3 +25,13 @@ Prompts and responses are kept here for review. This record contains no credenti
 **Follow-up prompt (user):** “Also, create an AGENTS.md file with project-wide rules for AI agents. Keep it simple, similar to what real projects use. Include rules for code style, architecture, module dependencies, testing, and verification before finishing changes. Make sure agents follow spec.md, standards/, and ADRs when making changes. Don't duplicate all the documentation in AGENTS.md, just reference it. Also, add a rule that agents should read AGENTS.md and the relevant project docs before starting work.”
 
 **Response (assistant):** Implemented the Lab 1 foundation, `AGENTS.md`, standards and ADRs, documentation, `/version`, automated checks and hooks. `make check` passes, including three tests; the module audit rejects a forbidden import; both hook scripts pass and propagate a failing check. Applying the migration is blocked because PostgreSQL is unavailable, and installing hooks or making the remaining commits is blocked because this session cannot write `.git/config`.
+
+## Audit and follow-up
+
+**Prompt (user):** “Now let’s audit the implementation. Review the code, project structure, module dependencies, and architecture against spec.md, standards/, and our ADRs. Find the top 3 real issues, unnecessary dependencies, or places where the implementation is more complicated than needed. For each issue, explain what’s wrong and where, why it’s a problem, and how we could improve it. Also check if we have any unnecessary modules or abstractions, especially the separate VersionModule. Don’t fix anything yet.”
+
+**Response (assistant):** Reported three findings: the dependency audit missed path aliases and actual module wiring; the smoke test called the controller instead of making an HTTP request; and the one-endpoint `VersionModule` was an unnecessary wrapper. No files were changed in the audit.
+
+**Prompt (user):** “I reviewed the audit results, and I agree with these three issues. The dependency audit should catch forbidden imports even when path aliases are used and check actual NestJS module imports. The smoke test should make a real HTTP request to /version. Move the controller and GitShaService to AppModule and remove VersionModule. Before fixing code, update the relevant spec or standards. Then fix each issue, add tests where needed, and run all checks.”
+
+**Response (assistant):** Updated `spec.md` and `standards/` first, added regression tests for alias imports and Nest module wiring, changed the smoke test to send an HTTP request through Nest using an in-memory transport, and registered the version controller and service directly in AppModule. `make check` passes with seven tests.
